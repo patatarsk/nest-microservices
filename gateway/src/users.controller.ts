@@ -8,7 +8,7 @@ import {
   Patch,
   Param,
   Delete,
-  // UseGuards,
+  UseGuards,
   Post,
   UseInterceptors,
   UploadedFile,
@@ -17,54 +17,56 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserDto } from './dto/update-user.dto';
-// import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
 import { ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
 
 @Controller('users')
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class UsersController {
-  constructor(@Inject('API_SERVICE') private client: ClientProxy) {}
+  constructor(@Inject('USERS_SERVICE') private usersService: ClientProxy) {}
 
   @Get()
-  // @ApiBearerAuth('access-token')
+  @ApiBearerAuth('access-token')
   async findAll() {
-    return this.client.send({ cmd: 'users_find_all' }, {});
+    return this.usersService.send({ cmd: 'users_find_all' }, {});
   }
 
   @Get('/autorship')
-  // @ApiBearerAuth('access-token')
+  @ApiBearerAuth('access-token')
   autorshipStatistic() {
-    return this.client.send({ cmd: 'users_autorship_statistic' }, {});
+    return this.usersService.send({ cmd: 'users_autorship_statistic' }, {});
   }
 
   @Get(':id')
-  // @ApiBearerAuth('access-token')
+  @ApiBearerAuth('access-token')
   findOne(@Param() ParamsUserDto: ParamsUserDto) {
     const { id } = ParamsUserDto;
 
-    return this.client.send({ cmd: 'users_find_one' }, { id });
+    return this.usersService.send({ cmd: 'users_find_one' }, id);
   }
 
   @Patch(':id')
-  // @ApiBearerAuth('access-token')
+  @ApiBearerAuth('access-token')
   update(
-    @Param() ParamsUserDto: ParamsUserDto,
+    @Param() paramsUserDto: ParamsUserDto,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const { id } = ParamsUserDto;
+    const { id } = paramsUserDto;
 
-    return this.client.send({ cmd: 'users_update' }, { id, updateUserDto });
+    return this.usersService.emit(
+      { cmd: 'users_update' },
+      { id, updateUserDto },
+    );
   }
 
   @Delete(':id')
-  // @ApiBearerAuth('access-token')
+  @ApiBearerAuth('access-token')
   remove(@Param() ParamsUserDto: ParamsUserDto) {
     const { id } = ParamsUserDto;
 
-    return this.client.send({ cmd: 'users_remove' }, { id });
+    return this.usersService.emit({ cmd: 'users_remove' }, id);
   }
 
   @Post('/upload/avatar')
@@ -75,7 +77,7 @@ export class UsersController {
       }),
     }),
   )
-  // @ApiBearerAuth('access-token')
+  @ApiBearerAuth('access-token')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'A new avatar for the user',
@@ -87,7 +89,7 @@ export class UsersController {
   ) {
     const { username } = req.user;
 
-    return this.client.send(
+    return this.usersService.emit(
       { cmd: 'users_upload_avatar' },
       { username, filename: file.filename },
     );

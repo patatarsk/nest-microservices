@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { EventPattern, MessagePattern } from '@nestjs/microservices';
 import { UsersService } from './users.service';
 
 @Controller()
@@ -21,18 +21,28 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @MessagePattern({ cmd: 'users_update' })
-  update(id, updateUserData) {
-    return this.usersService.update(id, updateUserData);
+  @MessagePattern({ cmd: 'users_find_by_email' })
+  findByEmail(email) {
+    return this.usersService.findByEmail(email);
   }
 
-  @MessagePattern({ cmd: 'users_remove' })
+  @MessagePattern({ cmd: 'users_create' })
+  create(createUserData) {
+    return this.usersService.create(createUserData);
+  }
+
+  @EventPattern({ cmd: 'users_update' })
+  update({ id, updateUserDto }) {
+    return this.usersService.update(id, updateUserDto);
+  }
+
+  @EventPattern({ cmd: 'users_remove' })
   remove(id) {
     return this.usersService.remove(id);
   }
 
-  @MessagePattern({ cmd: 'users_upload_avatar' })
-  uploadAvatar(username, filename) {
+  @EventPattern({ cmd: 'users_upload_avatar' })
+  uploadAvatar({ username, filename }) {
     return this.usersService.saveAvatar(username, filename);
   }
 }

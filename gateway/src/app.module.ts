@@ -1,16 +1,27 @@
+import { JwtStrategy } from './jwt.strategy';
+import { LocalStrategy } from './local.strategy';
+import { jwtConstants } from './constants';
+import { AuthController } from './auth.controller';
 import { UsersController } from './users.controller';
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
 
 const { USERS_SERVICE_PORT, USERS_SERVICE_HOST } = process.env;
 
 @Module({
   imports: [
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '1h' },
+    }),
     ClientsModule.register([
       {
-        name: 'API_SERVICE',
+        name: 'USERS_SERVICE',
         transport: Transport.TCP,
         options: {
           port: +USERS_SERVICE_PORT,
@@ -19,7 +30,7 @@ const { USERS_SERVICE_PORT, USERS_SERVICE_HOST } = process.env;
       },
     ]),
   ],
-  controllers: [AppController, UsersController],
-  providers: [AppService],
+  controllers: [AppController, UsersController, AuthController],
+  providers: [AppService, LocalStrategy, JwtStrategy],
 })
 export class AppModule {}
