@@ -1,15 +1,18 @@
 version: '3.9'
 
 services:
-  api:
-    build: ./api
+  gateway:
+    build: ./gateway
     command: npm run start:dev
     ports:
       - 3000:3000
     volumes:
-      - ./api:/api
-      - /api/node_modules
+      - ./gateway:/gateway
+      - /gateway/node_modules
     environment:
+      - PORT=3000
+      - USERS_SERVICE_PORT=4000
+      - USERS_SERVICE_HOST=users
       - MONGODB_URL=mongodb://test:test@mongodb:27017
       - MONGODB_DATABASE=test
   users:
@@ -19,17 +22,19 @@ services:
       - ./users:/users
       - /users/node_modules
     environment:
+      - PORT=4000
+      - HOST=users
       - MONGODB_URL=mongodb://test:test@mongodb:27017
       - MONGODB_DATABASE=test
-  news:
-    build: ./news
-    command: npm run start:dev
-    volumes:
-      - ./news:/news
-      - /news/node_modules
-    environment:
-      - MONGODB_URL=mongodb://test:test@mongodb:27017
-      - MONGODB_DATABASE=test
+  # news:
+  #   build: ./news
+  #   command: npm run start:dev
+  #   volumes:
+  #     - ./news:/news
+  #     - /news/node_modules
+  #   environment:
+  #     - MONGODB_URL=mongodb://test:test@mongodb:27017
+  #     - MONGODB_DATABASE=test
   mongodb:
     image: mongo:latest
     ports:
