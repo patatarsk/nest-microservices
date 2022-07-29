@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { EventPattern, MessagePattern } from '@nestjs/microservices';
 import { UsersService } from './users.service';
 
-@Controller()
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -44,5 +44,10 @@ export class UsersController {
   @EventPattern({ cmd: 'users_upload_avatar' })
   uploadAvatar({ username, filename }) {
     return this.usersService.saveAvatar(username, filename);
+  }
+
+  @EventPattern({ cmd: 'users_update_with_news' })
+  updateUsersWitnNewsId({ ids, newsId }) {
+    return this.usersService.updateUsersWithNewsId(ids, newsId);
   }
 }

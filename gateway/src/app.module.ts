@@ -1,3 +1,4 @@
+import { NewsController } from './news.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
 import { jwtConstants } from './constants';
@@ -10,7 +11,12 @@ import { AppService } from './app.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 
-const { USERS_SERVICE_PORT, USERS_SERVICE_HOST } = process.env;
+const {
+  USERS_SERVICE_PORT,
+  USERS_SERVICE_HOST,
+  NEWS_SERVICE_PORT,
+  NEWS_SERVICE_HOST,
+} = process.env;
 
 @Module({
   imports: [
@@ -28,9 +34,17 @@ const { USERS_SERVICE_PORT, USERS_SERVICE_HOST } = process.env;
           host: USERS_SERVICE_HOST,
         },
       },
+      {
+        name: 'NEWS_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          port: +NEWS_SERVICE_PORT,
+          host: NEWS_SERVICE_HOST,
+        },
+      },
     ]),
   ],
-  controllers: [AppController, UsersController, AuthController],
+  controllers: [AppController, UsersController, AuthController, NewsController],
   providers: [AppService, LocalStrategy, JwtStrategy],
 })
 export class AppModule {}

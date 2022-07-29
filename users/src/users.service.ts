@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
@@ -27,6 +27,12 @@ export class UsersService {
 
   async update(id: string, updateUserDto): Promise<void> {
     await this.userModel.updateOne({ _id: id }, updateUserDto).exec();
+  }
+
+  async updateUsersWithNewsId(ids: string[], newsId: ObjectId): Promise<void> {
+    await this.userModel
+      .updateMany({ _id: { $in: ids } }, { $push: { news: newsId } })
+      .exec();
   }
 
   async remove(id: string): Promise<void> {
