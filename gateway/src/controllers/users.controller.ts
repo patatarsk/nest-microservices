@@ -1,6 +1,6 @@
-import { ValidateFile } from './pipes/fileValidation.pipe';
-import { FileUploadDto } from './dto/file-upload.dto';
-import { ParamsUserDto } from './dto/params-user.dto';
+import { ValidateFile } from '../pipes/fileValidation.pipe';
+import { FileUploadDto } from '../dto/file-upload.dto';
+import { ParamsUserDto } from '../dto/params-user.dto';
 import {
   Controller,
   Get,
@@ -16,8 +16,8 @@ import {
   Inject,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { ClientProxy } from '@nestjs/microservices';

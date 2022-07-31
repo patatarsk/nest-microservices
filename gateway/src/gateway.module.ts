@@ -1,13 +1,13 @@
-import { NewsController } from './news.controller';
-import { JwtStrategy } from './jwt.strategy';
-import { LocalStrategy } from './local.strategy';
+import { NewsController } from './controllers/news.controller';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
 import { jwtConstants } from './constants';
-import { AuthController } from './auth.controller';
-import { UsersController } from './users.controller';
+import { AuthController } from './controllers/auth.controller';
+import { UsersController } from './controllers/users.controller';
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AppController } from './gateway.controller';
+import { AppService } from './gateway.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 

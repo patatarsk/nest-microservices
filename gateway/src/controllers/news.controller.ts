@@ -1,5 +1,5 @@
 import { ClientProxy } from '@nestjs/microservices';
-import { GetParamsDto } from './dto/get-params.dto';
+import { GetParamsDto } from '../dto/get-params.dto';
 import {
   Controller,
   Get,
@@ -10,8 +10,8 @@ import {
   Param,
   Inject,
 } from '@nestjs/common';
-import { CreateNewsDto } from './dto/create-news.dto';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { CreateNewsDto } from '../dto/create-news.dto';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('news')
