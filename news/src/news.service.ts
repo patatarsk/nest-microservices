@@ -1,3 +1,4 @@
+import { User, UserDocument } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { News, NewsDocument } from './schemas/news.schema';
 import mongoose from 'mongoose';
@@ -7,16 +8,22 @@ import { Injectable } from '@nestjs/common';
 export class NewsService {
   constructor(
     @InjectModel(News.name) private newsModel: mongoose.Model<NewsDocument>,
+    @InjectModel(User.name) private userModel: mongoose.Model<UserDocument>,
   ) {}
 
   async create(createNewsDto: any, ownerId: any) {
     const { owners, ...newsData } = createNewsDto;
-
-    const ceatedNews = await new this.newsModel({
+    const ceatedNews = new this.newsModel({
       ...newsData,
     });
+    const ownersIds = [...owners, ownerId];
 
-    ceatedNews.owners.push(...[...owners, ownerId]);
+    ceatedNews.owners.push(...ownersIds);
+
+    await this.userModel.updateMany(
+      { _id: { $in: ownersIds } },
+      { $push: { news: ceatedNews._id } },
+    );
 
     return ceatedNews.save();
   }

@@ -45,9 +45,4 @@ export class UsersController {
   uploadAvatar({ username, filename }) {
     return this.usersService.saveAvatar(username, filename);
   }
-
-  @EventPattern({ cmd: 'users_update_with_news' })
-  updateUsersWitnNewsId({ ids, newsId }) {
-    return this.usersService.updateUsersWithNewsId(ids, newsId);
-  }
 }

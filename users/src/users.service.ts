@@ -1,4 +1,4 @@
-import { Model, ObjectId } from 'mongoose';
+import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
@@ -11,12 +11,12 @@ export class UsersService {
     return this.userModel.find().exec();
   }
 
-  async findByEmail(email: string): Promise<UserDocument> {
-    return await this.userModel.findOne({ email }).exec();
+  findByEmail(email: string): Promise<UserDocument> {
+    return this.userModel.findOne({ email }).exec();
   }
 
-  async findOne(id: string): Promise<User> {
-    return await this.userModel.findById(id).exec();
+  findOne(id: string): Promise<User> {
+    return this.userModel.findById(id).exec();
   }
 
   async create(createUserDto): Promise<User> {
@@ -27,12 +27,6 @@ export class UsersService {
 
   async update(id: string, updateUserDto): Promise<void> {
     await this.userModel.updateOne({ _id: id }, updateUserDto).exec();
-  }
-
-  async updateUsersWithNewsId(ids: string[], newsId: ObjectId): Promise<void> {
-    await this.userModel
-      .updateMany({ _id: { $in: ids } }, { $push: { news: newsId } })
-      .exec();
   }
 
   async remove(id: string): Promise<void> {
