@@ -2,7 +2,7 @@ FROM node:16-alpine
 
 WORKDIR /gateway
 
-COPY package*.json .
+COPY package*.json ./
 
 RUN npm install
 
