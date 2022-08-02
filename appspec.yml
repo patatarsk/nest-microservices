@@ -1,8 +1,8 @@
 version: 0.0
 os: linux
 files:
-  - source: /
-    destination: /var/www/html/WordPress
+  - source: .
+    destination: /home/ec2-user/nest-microservices
 hooks:
   ApplicationStart:
     - location: scripts/start_server.sh
