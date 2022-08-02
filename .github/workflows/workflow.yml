@@ -43,4 +43,5 @@ jobs:
             --application-name nest-ci-cd \
             --deployment-group-name ProjectXCodeDeploy \
             --deployment-config-name CodeDeployDefault.OneAtATime \
+            --file-exists-behavior OVERWRITE\
             --github-location repository=${{ github.repository }},commitId=${{ github.sha }}
