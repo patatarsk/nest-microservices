@@ -6,10 +6,6 @@ services:
     command: npm run start:dev
     ports:
       - 80:3000
-    depends_on:
-      - users
-      - news
-      - mongodb
     volumes:
       - ./gateway:/gateway
       - /gateway/node_modules
