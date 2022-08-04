@@ -13,6 +13,9 @@ export class News {
   @Prop({ required: true })
   text: string;
 
+  @Prop({ required: false })
+  images: string[];
+
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   owners: mongoose.Schema.Types.ObjectId[];
 }

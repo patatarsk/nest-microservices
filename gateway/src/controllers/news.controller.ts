@@ -1,3 +1,4 @@
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ClientProxy } from '@nestjs/microservices';
 import { GetParamsDto } from '../dto/get-params.dto';
 import {
@@ -13,6 +14,9 @@ import {
 import { CreateNewsDto } from '../dto/create-news.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiConsumes } from '@nestjs/swagger';
+import { UseInterceptors } from '@nestjs/common';
+import { UploadedFiles } from '@nestjs/common';
 
 @Controller('news')
 @UseGuards(JwtAuthGuard)
@@ -24,12 +28,19 @@ export class NewsController {
 
   @Post()
   @ApiBearerAuth('access-token')
-  create(@Body() createNewsDto: CreateNewsDto, @Request() req) {
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('images'))
+  create(
+    @Body() createNewsDto: CreateNewsDto,
+    @Request() req,
+    @UploadedFiles()
+    files: { images?: Express.Multer.File[] },
+  ) {
     const { _id } = req.user;
 
     return this.newsService.send(
       { cmd: 'news_create' },
-      { _id, createNewsDto },
+      { _id, createNewsDto, images: files },
     );
   }
 

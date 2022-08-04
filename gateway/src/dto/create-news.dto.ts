@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray, IsMongoId } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsArray, IsMongoId, IsString } from 'class-validator';
 
 export class CreateNewsDto {
   @ApiProperty({
@@ -18,9 +19,28 @@ export class CreateNewsDto {
 
   @ApiProperty({
     description: "News owners id's",
-    example: ['Owner 1 id', 'Owner 2 id'],
+    type: 'array',
+    items: {
+      type: 'string',
+    },
   })
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.split(',') : value,
+  )
   @IsArray()
   @IsMongoId({ each: true })
   owners: string[];
+
+  @ApiProperty({
+    description: 'Images',
+    type: 'array',
+    items: {
+      type: 'file',
+      items: {
+        type: 'string',
+        format: 'binary',
+      },
+    },
+  })
+  images: Express.Multer.File[];
 }
