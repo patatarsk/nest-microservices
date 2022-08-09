@@ -108,13 +108,13 @@ export class NewsService {
       { $push: { news: ceatedNews._id } },
     );
 
-    const savedFilesInS3 = await this.saveFilesInAwsS3Bucket(images);
-
-    await this.saveImagePathsInDynamoDb(ceatedNews._id, savedFilesInS3);
-
     const news = await ceatedNews.save();
 
-    news.images = savedFilesInS3;
+    if (images.length) {
+      const savedFilesInS3 = await this.saveFilesInAwsS3Bucket(images);
+      await this.saveImagePathsInDynamoDb(ceatedNews._id, savedFilesInS3);
+      news.images = savedFilesInS3;
+    }
 
     return news;
   }

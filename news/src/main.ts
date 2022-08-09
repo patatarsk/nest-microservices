@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     NewsModule,
     {
-      transport: Transport.TCP,
+      transport: Transport.REDIS,
       options: {
         port: +PORT,
         host: HOST,

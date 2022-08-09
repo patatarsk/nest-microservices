@@ -11,10 +11,8 @@ services:
       - /gateway/node_modules
     environment:
       - PORT=3000
-      - USERS_SERVICE_PORT=4000
-      - USERS_SERVICE_HOST=users
-      - NEWS_SERVICE_PORT=4004
-      - NEWS_SERVICE_HOST=news
+      - HOST=redis
+      - REDIS_PORT=6379
       - MONGODB_URL=mongodb://test:test@mongodb:27017
       - MONGODB_DATABASE=test
   users:
@@ -24,8 +22,8 @@ services:
       - ./users:/users
       - /users/node_modules
     environment:
-      - PORT=4000
-      - HOST=users
+      - PORT=6379
+      - HOST=redis
       - MONGODB_URL=mongodb://test:test@mongodb:27017
       - MONGODB_DATABASE=test
   news:
@@ -35,8 +33,8 @@ services:
       - ./news:/news
       - /news/node_modules
     environment:
-      - PORT=4004
-      - HOST=news
+      - PORT=6379
+      - HOST=redis
       - MONGODB_URL=mongodb://test:test@mongodb:27017
       - MONGODB_DATABASE=test
   mongodb:
@@ -49,5 +47,12 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=test
       - MONGO_INITDB_ROOT_PASSWORD=test
       - MONGO_INITDB_DATABASE=test
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-volume:/data
 volumes:
   mongo-volume:
+  redis-volume:

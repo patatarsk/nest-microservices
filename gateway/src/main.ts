@@ -1,4 +1,5 @@
-import { HttpException, ValidationPipe, HttpStatus } from '@nestjs/common';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './gateway.module';
@@ -7,10 +8,18 @@ import { join, extname } from 'path';
 
 const workerPath = join(__dirname, 'mailer/main' + extname(__filename));
 
-const { PORT } = process.env;
+const { PORT, REDIS_PORT, HOST } = process.env;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const microservice = app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.REDIS,
+    options: {
+      host: HOST,
+      port: +REDIS_PORT,
+    },
+  });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
@@ -38,9 +47,10 @@ async function bootstrap() {
   const mailer = new Worker(workerPath);
 
   mailer.on('error', (error) => {
-    throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    console.log(error);
   });
 
+  await app.startAllMicroservices();
   await app.listen(PORT);
 }
 bootstrap();

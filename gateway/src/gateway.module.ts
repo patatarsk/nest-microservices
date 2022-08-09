@@ -11,12 +11,7 @@ import { AppService } from './gateway.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 
-const {
-  USERS_SERVICE_PORT,
-  USERS_SERVICE_HOST,
-  NEWS_SERVICE_PORT,
-  NEWS_SERVICE_HOST,
-} = process.env;
+const { REDIS_PORT, HOST } = process.env;
 
 @Module({
   imports: [
@@ -28,18 +23,18 @@ const {
     ClientsModule.register([
       {
         name: 'USERS_SERVICE',
-        transport: Transport.TCP,
+        transport: Transport.REDIS,
         options: {
-          port: +USERS_SERVICE_PORT,
-          host: USERS_SERVICE_HOST,
+          port: +REDIS_PORT,
+          host: HOST,
         },
       },
       {
         name: 'NEWS_SERVICE',
-        transport: Transport.TCP,
+        transport: Transport.REDIS,
         options: {
-          port: +NEWS_SERVICE_PORT,
-          host: NEWS_SERVICE_HOST,
+          port: +REDIS_PORT,
+          host: HOST,
         },
       },
     ]),
