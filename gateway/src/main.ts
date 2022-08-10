@@ -1,24 +1,21 @@
-import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import { MicroserviceOptions } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './gateway.module';
 import { Worker } from 'worker_threads';
 import { join, extname } from 'path';
+import { SocketsServer } from './serverSockets';
 
 const workerPath = join(__dirname, 'mailer/main' + extname(__filename));
 
-const { PORT, REDIS_PORT, HOST } = process.env;
+const { PORT } = process.env;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  const strategy = app.get<SocketsServer>('SOCKET_SERVER');
   const microservice = app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.REDIS,
-    options: {
-      host: HOST,
-      port: +REDIS_PORT,
-    },
+    strategy,
   });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
@@ -40,7 +37,6 @@ async function bootstrap() {
       'access-token',
     )
     .build();
-
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 

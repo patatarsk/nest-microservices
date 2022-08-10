@@ -11,10 +11,18 @@ services:
       - /gateway/node_modules
     environment:
       - PORT=3000
-      - HOST=redis
-      - REDIS_PORT=6379
+      - NEWS_PORT=5050
+      - NEWS_HOST=news
+      - USERS_PORT=4040
+      - USERS_HOST=users
+      - SOCKET_PORT=3030
+      - SOCKET_HOST=gateway
       - MONGODB_URL=mongodb://test:test@mongodb:27017
       - MONGODB_DATABASE=test
+    depends_on:
+      - users
+      - news
+      - mongodb
   users:
     build: ./users
     command: npm run start:dev
@@ -22,8 +30,8 @@ services:
       - ./users:/users
       - /users/node_modules
     environment:
-      - PORT=6379
-      - HOST=redis
+      - PORT=4040
+      - HOST=users
       - MONGODB_URL=mongodb://test:test@mongodb:27017
       - MONGODB_DATABASE=test
   news:
@@ -33,8 +41,8 @@ services:
       - ./news:/news
       - /news/node_modules
     environment:
-      - PORT=6379
-      - HOST=redis
+      - PORT=5050
+      - HOST=news
       - MONGODB_URL=mongodb://test:test@mongodb:27017
       - MONGODB_DATABASE=test
   mongodb:
@@ -47,12 +55,5 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=test
       - MONGO_INITDB_ROOT_PASSWORD=test
       - MONGO_INITDB_DATABASE=test
-  redis:
-    image: redis:alpine
-    ports:
-      - 6379:6379
-    volumes:
-      - redis-volume:/data
 volumes:
   mongo-volume:
-  redis-volume:
