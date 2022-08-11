@@ -31,12 +31,12 @@ export class SocketsServer extends Server implements CustomTransportStrategy {
           reject(error);
         })
         .on('connection', (socket) => {
-          socket.on('message', (message) => {
+          socket.on('message', (message: Buffer) => {
             const { cmd, data } = JSON.parse(message.toString());
             const event = this.emitter.emit(JSON.stringify(cmd), data);
 
             if (!event) {
-              console.log('event not found');
+              console.log(`event: ${cmd} not found`);
             }
           });
         });
