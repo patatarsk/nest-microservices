@@ -1,11 +1,9 @@
-import { MicroserviceOptions } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './gateway.module';
 import { Worker } from 'worker_threads';
 import { join, extname } from 'path';
-import { SocketsServer } from './serverSockets';
 
 const workerPath = join(__dirname, 'mailer/main' + extname(__filename));
 
@@ -13,10 +11,6 @@ const { PORT } = process.env;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const strategy = app.get<SocketsServer>('SOCKET_SERVER');
-  const microservice = app.connectMicroservice<MicroserviceOptions>({
-    strategy,
-  });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
@@ -46,7 +40,6 @@ async function bootstrap() {
     console.log(error);
   });
 
-  await app.startAllMicroservices();
   await app.listen(PORT);
 }
 bootstrap();
