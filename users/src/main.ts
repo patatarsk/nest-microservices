@@ -1,18 +1,17 @@
+import { SocketsServer } from './serverSockets';
 import { UsersModule } from './users.module';
 import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { MicroserviceOptions } from '@nestjs/microservices';
 
 const { PORT, HOST } = process.env;
 
 async function bootstrap() {
+  const strategy = new SocketsServer(PORT, HOST);
+  await strategy.startServer();
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     UsersModule,
     {
-      transport: Transport.TCP,
-      options: {
-        port: +PORT,
-        host: HOST,
-      },
+      strategy,
     },
   );
 

@@ -21,10 +21,7 @@ import { UploadedFiles } from '@nestjs/common';
 @Controller('news')
 @UseGuards(JwtAuthGuard)
 export class NewsController {
-  constructor(
-    @Inject('USERS_SERVICE') private usersService: ClientProxy,
-    @Inject('NEWS_SERVICE') private newsService: ClientProxy,
-  ) {}
+  constructor(@Inject('NEWS_SERVICE') private newsService: ClientProxy) {}
 
   @Post()
   @ApiBearerAuth('access-token')

@@ -5,17 +5,20 @@ import { jwtConstants } from './constants';
 import { AuthController } from './controllers/auth.controller';
 import { UsersController } from './controllers/users.controller';
 import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './gateway.controller';
 import { AppService } from './gateway.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { SocketsServer } from './serverSockets';
+import { SocketsServerClient } from './socketClient';
 
 const {
-  USERS_SERVICE_PORT,
-  USERS_SERVICE_HOST,
-  NEWS_SERVICE_PORT,
-  NEWS_SERVICE_HOST,
+  SOCKET_HOST,
+  SOCKET_PORT,
+  NEWS_PORT,
+  NEWS_HOST,
+  USERS_PORT,
+  USERS_HOST,
 } = process.env;
 
 @Module({
@@ -25,26 +28,36 @@ const {
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1h' },
     }),
-    ClientsModule.register([
-      {
-        name: 'USERS_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          port: +USERS_SERVICE_PORT,
-          host: USERS_SERVICE_HOST,
-        },
-      },
-      {
-        name: 'NEWS_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          port: +NEWS_SERVICE_PORT,
-          host: NEWS_SERVICE_HOST,
-        },
-      },
-    ]),
   ],
   controllers: [AppController, UsersController, AuthController, NewsController],
-  providers: [AppService, LocalStrategy, JwtStrategy],
+  providers: [
+    AppService,
+    LocalStrategy,
+    JwtStrategy,
+    {
+      provide: 'SOCKET_SERVER',
+      useFactory: async () => {
+        const server = await new SocketsServer(SOCKET_PORT, SOCKET_HOST);
+        await server.startServer();
+        return server;
+      },
+    },
+    {
+      provide: 'NEWS_SERVICE',
+      useFactory: async () => {
+        const client = await new SocketsServerClient(NEWS_PORT, NEWS_HOST);
+        await client.connectSocket();
+        return client;
+      },
+    },
+    {
+      provide: 'USERS_SERVICE',
+      useFactory: async () => {
+        const client = await new SocketsServerClient(USERS_PORT, USERS_HOST);
+        await client.connectSocket();
+        return client;
+      },
+    },
+  ],
 })
 export class AppModule {}

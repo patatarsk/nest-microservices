@@ -11,12 +11,18 @@ services:
       - /gateway/node_modules
     environment:
       - PORT=3000
-      - USERS_SERVICE_PORT=4000
-      - USERS_SERVICE_HOST=users
-      - NEWS_SERVICE_PORT=4004
-      - NEWS_SERVICE_HOST=news
+      - NEWS_PORT=5050
+      - NEWS_HOST=news
+      - USERS_PORT=4040
+      - USERS_HOST=users
+      - SOCKET_PORT=3030
+      - SOCKET_HOST=gateway
       - MONGODB_URL=mongodb://test:test@mongodb:27017
       - MONGODB_DATABASE=test
+    depends_on:
+      - users
+      - news
+      - mongodb
   users:
     build: ./users
     command: npm run start:dev
@@ -24,7 +30,7 @@ services:
       - ./users:/users
       - /users/node_modules
     environment:
-      - PORT=4000
+      - PORT=4040
       - HOST=users
       - MONGODB_URL=mongodb://test:test@mongodb:27017
       - MONGODB_DATABASE=test
@@ -35,7 +41,7 @@ services:
       - ./news:/news
       - /news/node_modules
     environment:
-      - PORT=4004
+      - PORT=5050
       - HOST=news
       - MONGODB_URL=mongodb://test:test@mongodb:27017
       - MONGODB_DATABASE=test
