@@ -11,12 +11,7 @@ services:
       - /gateway/node_modules
     environment:
       - PORT=3000
-      - NEWS_PORT=5050
-      - NEWS_HOST=news
-      - USERS_PORT=4040
-      - USERS_HOST=users
-      - SOCKET_PORT=3030
-      - SOCKET_HOST=gateway
+      - HOST=gateway
       - MONGODB_URL=mongodb://test:test@mongodb:27017
       - MONGODB_DATABASE=test
     depends_on:

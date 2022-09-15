@@ -25,18 +25,18 @@ import { ClientProxy } from '@nestjs/microservices';
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
-  constructor(@Inject('USERS_SERVICE') private usersService: ClientProxy) {}
+  constructor(@Inject('SQS_SERVICE') private sqsService: ClientProxy) {}
 
   @Get()
   @ApiBearerAuth('access-token')
   async findAll() {
-    return this.usersService.send({ cmd: 'users_find_all' }, {});
+    return this.sqsService.send({ cmd: 'users_find_all' }, {});
   }
 
   @Get('/autorship')
   @ApiBearerAuth('access-token')
   autorshipStatistic() {
-    return this.usersService.send({ cmd: 'users_autorship_statistic' }, {});
+    return this.sqsService.send({ cmd: 'users_autorship_statistic' }, {});
   }
 
   @Get(':id')
@@ -44,7 +44,7 @@ export class UsersController {
   findOne(@Param() ParamsUserDto: ParamsUserDto) {
     const { id } = ParamsUserDto;
 
-    return this.usersService.send({ cmd: 'users_find_one' }, id);
+    return this.sqsService.send({ cmd: 'users_find_one' }, { id });
   }
 
   @Patch(':id')
@@ -55,10 +55,7 @@ export class UsersController {
   ) {
     const { id } = paramsUserDto;
 
-    return this.usersService.emit(
-      { cmd: 'users_update' },
-      { id, updateUserDto },
-    );
+    return this.sqsService.emit({ cmd: 'users_update' }, { id, updateUserDto });
   }
 
   @Delete(':id')
@@ -66,7 +63,7 @@ export class UsersController {
   remove(@Param() ParamsUserDto: ParamsUserDto) {
     const { id } = ParamsUserDto;
 
-    return this.usersService.emit({ cmd: 'users_remove' }, id);
+    return this.sqsService.emit({ cmd: 'users_remove' }, { id });
   }
 
   @Post('/upload/avatar')
@@ -89,7 +86,7 @@ export class UsersController {
   ) {
     const { username } = req.user;
 
-    return this.usersService.emit(
+    return this.sqsService.emit(
       { cmd: 'users_upload_avatar' },
       { username, filename: file.filename },
     );

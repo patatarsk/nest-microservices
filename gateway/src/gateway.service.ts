@@ -20,7 +20,7 @@ const { AWS_SQS_URL, AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } =
 @Injectable()
 export class AppService {
   constructor(
-    @Inject('USERS_SERVICE') private usersService: ClientProxy,
+    @Inject('SQS_SERVICE') private usersService: ClientProxy,
     private jwtService: JwtService,
   ) {}
 
@@ -32,7 +32,7 @@ export class AppService {
     const { email } = signUpUserDto;
 
     const getUser = await lastValueFrom(
-      this.usersService.send({ cmd: 'users_find_by_email' }, email),
+      this.usersService.send({ cmd: 'users_find_by_email' }, { email }),
     );
 
     if (getUser) {
@@ -52,7 +52,10 @@ export class AppService {
 
   async validateUser(username: string, password: string): Promise<any> {
     const getUser = await lastValueFrom(
-      this.usersService.send({ cmd: 'users_find_by_email' }, username),
+      this.usersService.send(
+        { cmd: 'users_find_by_email' },
+        { email: username },
+      ),
     );
 
     if (!getUser) {
@@ -81,7 +84,10 @@ export class AppService {
 
   async recoverPasswordRequest(username: string): Promise<any> {
     const getUser = await lastValueFrom(
-      this.usersService.send({ cmd: 'users_find_by_email' }, username),
+      this.usersService.send(
+        { cmd: 'users_find_by_email' },
+        { email: username },
+      ),
     );
 
     if (!getUser) {
@@ -125,7 +131,7 @@ export class AppService {
 
   async recoverPassword(email, token, password, confirm) {
     const getUser = await lastValueFrom(
-      this.usersService.send({ cmd: 'users_find_by_email' }, email),
+      this.usersService.send({ cmd: 'users_find_by_email' }, { email }),
     );
 
     if (!getUser) {

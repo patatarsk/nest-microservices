@@ -9,17 +9,10 @@ import { AppController } from './gateway.controller';
 import { AppService } from './gateway.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { SocketsServer } from './serverSockets';
-import { SocketsServerClient } from './socketClient';
+import { TransportStrategy, SQSClient } from '@patatarsk/sqs-transport-client';
 
-const {
-  SOCKET_HOST,
-  SOCKET_PORT,
-  NEWS_PORT,
-  NEWS_HOST,
-  USERS_PORT,
-  USERS_HOST,
-} = process.env;
+const { AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, HOST } =
+  process.env;
 
 @Module({
   imports: [
@@ -35,26 +28,35 @@ const {
     LocalStrategy,
     JwtStrategy,
     {
-      provide: 'SOCKET_SERVER',
+      provide: 'SQS_TRANSPORT',
       useFactory: async () => {
-        const server = await new SocketsServer(SOCKET_PORT, SOCKET_HOST);
-        await server.startServer();
-        return server;
+        const transport = new TransportStrategy({
+          region: AWS_REGION,
+          credentials: {
+            accessKeyId: AWS_ACCESS_KEY_ID,
+            secretAccessKey: AWS_SECRET_ACCESS_KEY,
+          },
+        });
+
+        return transport;
       },
     },
     {
-      provide: 'NEWS_SERVICE',
+      provide: 'SQS_SERVICE',
       useFactory: async () => {
-        const client = await new SocketsServerClient(NEWS_PORT, NEWS_HOST);
-        await client.connectSocket();
-        return client;
-      },
-    },
-    {
-      provide: 'USERS_SERVICE',
-      useFactory: async () => {
-        const client = await new SocketsServerClient(USERS_PORT, USERS_HOST);
-        await client.connectSocket();
+        const client = new SQSClient(
+          {
+            region: AWS_REGION,
+            credentials: {
+              accessKeyId: AWS_ACCESS_KEY_ID,
+              secretAccessKey: AWS_SECRET_ACCESS_KEY,
+            },
+          },
+          HOST,
+        );
+
+        await client.initReceiver();
+
         return client;
       },
     },

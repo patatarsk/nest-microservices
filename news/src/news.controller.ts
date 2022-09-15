@@ -1,13 +1,13 @@
 import { NewsService } from './news.service';
 import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { MessagePattern } from '@nestjs/microservices';
 
 @Controller('news')
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
   @MessagePattern({ cmd: 'news_create' })
-  async create(@Payload() { _id, createNewsDto, images }) {
+  async create({ _id, createNewsDto, images }) {
     return await this.newsService.create(createNewsDto, _id, images);
   }
 
@@ -17,7 +17,7 @@ export class NewsController {
   }
 
   @MessagePattern({ cmd: 'news_find_one' })
-  findOne(@Payload() id) {
+  findOne({ id }) {
     return this.newsService.findOne(id);
   }
 }

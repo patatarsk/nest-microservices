@@ -21,7 +21,7 @@ import { UploadedFiles } from '@nestjs/common';
 @Controller('news')
 @UseGuards(JwtAuthGuard)
 export class NewsController {
-  constructor(@Inject('NEWS_SERVICE') private newsService: ClientProxy) {}
+  constructor(@Inject('SQS_SERVICE') private sqsService: ClientProxy) {}
 
   @Post()
   @ApiBearerAuth('access-token')
@@ -35,7 +35,7 @@ export class NewsController {
   ) {
     const { _id } = req.user;
 
-    return this.newsService.send(
+    return this.sqsService.send(
       { cmd: 'news_create' },
       { _id, createNewsDto, images: files },
     );
@@ -44,7 +44,7 @@ export class NewsController {
   @Get()
   @ApiBearerAuth('access-token')
   findAll() {
-    return this.newsService.send({ cmd: 'news_find_all' }, {});
+    return this.sqsService.send({ cmd: 'news_find_all' }, {});
   }
 
   @Get(':id')
@@ -52,6 +52,6 @@ export class NewsController {
   findOne(@Param() getParamsDto: GetParamsDto) {
     const { id } = getParamsDto;
 
-    return this.newsService.send({ cmd: 'news_find_one' }, id);
+    return this.sqsService.send({ cmd: 'news_find_one' }, { id });
   }
 }
